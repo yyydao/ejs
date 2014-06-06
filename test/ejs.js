@@ -299,6 +299,22 @@ describe('includes', function(){
   })
 })
 
+describe('block', function () {
+    //you should add your absolute path here to make the test
+    //var the_block_path = '';
+    it('should equal the file read from the absolute path',function(){
+        ejs.blockpath = the_block_path;
+        var file = "test/fixtures/block.ejs";
+        ejs.render(fixture('block.ejs'))
+            .should.equal(fixture('block.html'));
+    });
+
+    it('should pass the tag with {% %}',function(){
+        ejs.render(fixture('block.tag.ejs'),{open:'{%',close:'%}',blockpath:the_block_path})
+            .should.equal(fixture('block.html'));
+    });
+});
+
 describe('comments', function() {
   it('should fully render with comments removed', function() {
     ejs.render(fixture('comments.ejs'))

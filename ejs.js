@@ -111,7 +111,7 @@ function filtered(js) {
     if (args) args = ', ' + args;
     return 'filters.' + name + '(' + js + args + ')';
   });
-};
+}
 
 /**
  * Re-throw the given `err` in context to the
@@ -160,6 +160,7 @@ var parse = exports.parse = function(str, options){
   var options = options || {}
     , open = options.open || exports.open || '<%'
     , close = options.close || exports.close || '%>'
+    , blockpath = options.blockpath || exports.blockpath
     , filename = options.filename
     , compileDebug = options.compileDebug !== false
     , buf = "";
@@ -174,7 +175,7 @@ var parse = exports.parse = function(str, options){
   for (var i = 0, len = str.length; i < len; ++i) {
     var stri = str[i];
     if (str.slice(i, open.length + i) == open) {
-      i += open.length
+      i += open.length;
 
       var prefix, postfix, line = (compileDebug ? '__stack.lineno=' : '') + lineno;
       switch (str[i]) {
@@ -202,6 +203,7 @@ var parse = exports.parse = function(str, options){
       var js = str.substring(i, end)
         , start = i
         , include = null
+        , block = null
         , n = 0;
 
       if ('-' == js[js.length-1]){
@@ -218,6 +220,13 @@ var parse = exports.parse = function(str, options){
         buf += "' + (function(){" + include + "})() + '";
         js = '';
       }
+
+        if (0 == js.trim().indexOf('block')) {
+            block = read(blockpath + js.trim() + '.ejs', 'utf8');
+            block = exports.parse(include, {  _with: false, open: open, close: close, compileDebug: compileDebug });
+            buf += "' + (function(){" + block + "})() + '";
+            js = '';
+        }
 
       while (~(n = js.indexOf("\n", n))) n++, lineno++;
       if (js.substr(0, 1) == ':') js = filtered(js);

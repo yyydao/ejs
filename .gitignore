@@ -2,3 +2,5 @@
 *.sw[a-z]
 vim/.netrwhist
 node_modules
+.idea
+*.iml
